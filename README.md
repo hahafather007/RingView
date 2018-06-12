@@ -30,12 +30,17 @@ dependencies {
 ```java
 ringView.updateView(list);
 ```
-设置图片资源的点击事件：（自定义View可在外部设置点击事件之后再调用`ringView.updateView()`方法）
+设置图片资源的触摸和点击事件：（自定义View可在外部设置相应事件之后再调用`ringView.updateView()`方法）
 ```java
-ringView.setPhotoClickListener(new RingView.OnPhotoClickListener() {
+ringView.setPhotoTouchListener(new RingView.OnPhotoTouchListener() {
     @Override
     public void click(int position, String url) {
-        Logger.i("Click position=== " + position + " Url=== " + url);
+	Logger.i("Click position=== " + position + " Url=== " + url);
+    }
+
+    @Override
+    public void touch(View v, MotionEvent event) {
+	Logger.i("MotionEvent===" + event.toString());
     }
 });
 ```
