@@ -134,6 +134,13 @@ public class RingView extends ViewPager {
     }
 
     /**
+     * 当轮播的对象为图片资源时，设置的点击事件监听器
+     */
+    public void setPhotoClickListener(OnPhotoClickListener listener) {
+        adapter.setPhotoClickListener(listener);
+    }
+
+    /**
      * 调用该方法停止轮播
      */
     public void stopRing() {
@@ -197,6 +204,7 @@ public class RingView extends ViewPager {
         views.clear();
         imgs.clear();
         adapter.release();
+        timerHandler = null;
 
         clearOnPageChangeListeners();
     }
@@ -213,5 +221,9 @@ public class RingView extends ViewPager {
                 moveToNext(withAnim);
             }
         }
+    }
+
+    public interface OnPhotoClickListener {
+        void click(int position, String url);
     }
 }

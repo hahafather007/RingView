@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.hahafather007.ringview.view.RingView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class RingViewAdapter extends PagerAdapter {
     private List<Object> views = new ArrayList<>();
     private Context context;
     private ViewPager pager;
+    private RingView.OnPhotoClickListener listener;
 
     public RingViewAdapter(Context context) {
         this.context = context;
@@ -50,13 +52,21 @@ public class RingViewAdapter extends PagerAdapter {
 
     @NonNull
     @Override
-    public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        Object o = views.get(position % views.size());
+    public Object instantiateItem(@NonNull ViewGroup container, final int position) {
+        final int realPosition = position % views.size();
+        final Object o = views.get(realPosition);
 
         if (o instanceof String) {
             ImageView image = new ImageView(context);
             image.setScaleType(ImageView.ScaleType.FIT_XY);
-            image.setBackgroundColor(Color.GREEN);
+            if (listener != null) {
+                image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.click(realPosition, o.toString());
+                    }
+                });
+            }
 
             Glide.with(image).load(o.toString()).into(image);
 
@@ -101,6 +111,13 @@ public class RingViewAdapter extends PagerAdapter {
     }
 
     /**
+     * 当轮播的对象为图片资源时，设置的点击事件监听器
+     */
+    public void setPhotoClickListener(RingView.OnPhotoClickListener listener) {
+        this.listener = listener;
+    }
+
+    /**
      * @param currentItem 传入真实的位置，返回图像数据对应位置
      */
     public int getPositionByCurrentItem(int currentItem) {
@@ -112,5 +129,6 @@ public class RingViewAdapter extends PagerAdapter {
      */
     public void release() {
         views.clear();
+        listener = null;
     }
 }
