@@ -1,9 +1,10 @@
 apply plugin: 'com.android.library'
 
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.hahafather007'
+
 android {
     compileSdkVersion 27
-
-
 
     defaultConfig {
         minSdkVersion 14
@@ -21,7 +22,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
