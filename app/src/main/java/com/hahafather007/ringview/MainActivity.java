@@ -2,6 +2,7 @@ package com.hahafather007.ringview;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.hahafather007.ringview.utils.Logger;
@@ -45,10 +46,15 @@ public class MainActivity extends AppCompatActivity {
 
         ringView.updateView(list);
         ringView.startRing(true);
-        ringView.setPhotoClickListener(new RingView.OnPhotoClickListener() {
+        ringView.setPhotoTouchListener(new RingView.OnPhotoTouchListener() {
             @Override
             public void click(int position, String url) {
                 Logger.i("Click position=== " + position + " Url=== " + url);
+            }
+
+            @Override
+            public void touch(View v, MotionEvent event) {
+                Logger.i("MotionEvent===" + event.toString());
             }
         });
 

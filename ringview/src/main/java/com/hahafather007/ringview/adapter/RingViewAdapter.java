@@ -1,10 +1,11 @@
 package com.hahafather007.ringview.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,7 +23,7 @@ public class RingViewAdapter extends PagerAdapter {
     private List<Object> views = new ArrayList<>();
     private Context context;
     private ViewPager pager;
-    private RingView.OnPhotoClickListener listener;
+    private RingView.OnPhotoTouchListener listener;
 
     public RingViewAdapter(Context context) {
         this.context = context;
@@ -50,6 +51,7 @@ public class RingViewAdapter extends PagerAdapter {
         container.removeView(((View) object));
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, final int position) {
@@ -60,10 +62,16 @@ public class RingViewAdapter extends PagerAdapter {
             ImageView image = new ImageView(context);
             image.setScaleType(ImageView.ScaleType.FIT_XY);
             if (listener != null) {
-                image.setOnClickListener(new View.OnClickListener() {
+                image.setOnTouchListener(new View.OnTouchListener() {
                     @Override
-                    public void onClick(View v) {
-                        listener.click(realPosition, o.toString());
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (event.getAction() == MotionEvent.ACTION_UP) {
+                            listener.click(position % views.size(), o.toString());
+                        }
+
+                        listener.touch(v, event);
+
+                        return true;
                     }
                 });
             }
@@ -113,7 +121,7 @@ public class RingViewAdapter extends PagerAdapter {
     /**
      * 当轮播的对象为图片资源时，设置的点击事件监听器
      */
-    public void setPhotoClickListener(RingView.OnPhotoClickListener listener) {
+    public void setPhotoTouchListener(RingView.OnPhotoTouchListener listener) {
         this.listener = listener;
     }
 

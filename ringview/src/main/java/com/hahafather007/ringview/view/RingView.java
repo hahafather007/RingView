@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.hahafather007.ringview.adapter.RingViewAdapter;
@@ -136,8 +137,8 @@ public class RingView extends ViewPager {
     /**
      * 当轮播的对象为图片资源时，设置的点击事件监听器
      */
-    public void setPhotoClickListener(OnPhotoClickListener listener) {
-        adapter.setPhotoClickListener(listener);
+    public void setPhotoTouchListener(OnPhotoTouchListener listener) {
+        adapter.setPhotoTouchListener(listener);
     }
 
     /**
@@ -223,7 +224,9 @@ public class RingView extends ViewPager {
         }
     }
 
-    public interface OnPhotoClickListener {
+    public interface OnPhotoTouchListener {
         void click(int position, String url);
+
+        void touch(View v, MotionEvent event);
     }
 }
