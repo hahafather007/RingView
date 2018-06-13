@@ -14,7 +14,7 @@ allprojects {
 然后在app的`build.gradle`添加依赖即可：
 ```gradle
 dependencies {
-        implementation 'com.github.hahafather007:RingView:0.1'
+        implementation 'com.github.hahafather007:RingView:0.2'
 }
 ```
 
