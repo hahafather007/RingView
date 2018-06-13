@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.hahafather007.ringview.utils.Logger;
 import com.hahafather007.ringview.view.RingView;
 
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class RingViewAdapter extends PagerAdapter {
 
     public RingViewAdapter(Context context) {
         this.context = context;
+
+        Logger.init(context);
     }
 
     /**
