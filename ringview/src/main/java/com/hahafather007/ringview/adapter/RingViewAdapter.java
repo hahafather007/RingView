@@ -28,8 +28,6 @@ public class RingViewAdapter extends PagerAdapter {
 
     public RingViewAdapter(Context context) {
         this.context = context;
-
-        Logger.init(context);
     }
 
     /**
@@ -85,16 +83,23 @@ public class RingViewAdapter extends PagerAdapter {
 
             return image;
         } else {
-            container.addView(((View) o));
+            View view = (View) o;
+            ViewGroup parent = (ViewGroup) view.getParent();
+
+            if (parent != null) {
+                parent.removeView(view);
+            }
+
+            Logger.i(view.getBackground() + " ");
+
+            container.addView(view);
 
             return o;
         }
     }
 
-    public void setViews(List<String> imgs, List<View> viewList) {
-        views.clear();
-        views.addAll(imgs);
-        views.addAll(viewList);
+    public void setViews(List<Object> viewList) {
+        views = viewList;
 
         notifyDataSetChanged();
 
@@ -110,12 +115,26 @@ public class RingViewAdapter extends PagerAdapter {
         pager.setAdapter(this);
         pager.setOffscreenPageLimit(3);
         pager.addOnPageChangeListener(new SimplePageChangeListener() {
+            int thisPosition;
+
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (position <= views.size() - 1) {
-                    pager.setCurrentItem(position + views.size(), false);
-                } else if (position >= views.size() * 2) {
-                    pager.setCurrentItem(position - views.size(), false);
+                thisPosition = position;
+            }
+
+            /**
+             * 在空闲状态才进行是否滚动页面的判断，是为了防止在滚动到最后一页时，由于页面还
+             * 未滚动完毕就直接进行跳转，造成页面闪烁
+             */
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                //SCROLL_STATE_IDLE 表示目前没有滚动，处于空闲状态
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    if (thisPosition <= views.size() - 1) {
+                        pager.setCurrentItem(thisPosition + views.size(), false);
+                    } else if (thisPosition >= views.size() * 2) {
+                        pager.setCurrentItem(thisPosition - views.size(), false);
+                    }
                 }
             }
         });

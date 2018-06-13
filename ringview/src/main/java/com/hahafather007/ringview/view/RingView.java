@@ -32,13 +32,9 @@ public class RingView extends ViewPager {
     private Handler timerHandler;
     private Timer timer;
     /**
-     * 当轮播内容为图片url时使用imgs
+     * Object可为图片url或View
      */
-    private List<String> imgs;
-    /**
-     * 当轮播内容为View时使用views
-     */
-    private List<View> views;
+    private List<Object> views;
     private RingViewAdapter adapter;
     /**
      * 轮播的间隔时间，默认1000毫秒
@@ -58,7 +54,6 @@ public class RingView extends ViewPager {
 
     private void init() {
         timer = new Timer();
-        imgs = new ArrayList<>();
         views = new ArrayList<>();
         adapter = new RingViewAdapter(getContext());
         timerHandler = new TimerHandler();
@@ -82,32 +77,27 @@ public class RingView extends ViewPager {
     public <T> void updateView(List<T> list) {
         stopRing();
 
-        imgs.clear();
         views.clear();
 
         if (list.size() >= 1) {
             Logger.i(list.get(0).getClass().getSimpleName());
 
-            if (!(list.get(0) instanceof String) && !(list.get(0) instanceof View)) {
-                throw new RuntimeException("List的类型只能为String或View中的一种，不能使用其他无效类型");
-            }
-
             for (T t : list) {
                 if (t instanceof String) {
-                    imgs.add(t.toString());
+                    views.add(t.toString());
                 } else if (t instanceof View) {
-                    views.add(((View) t));
+                    views.add(t);
                 }
             }
 
-            if (!imgs.isEmpty() && !views.isEmpty()) {
-                throw new RuntimeException("List的类型只能为String或View中的一种，不能使用混合类型");
+            if (views.isEmpty()) {
+                throw new RuntimeException("List的类型只能为String和View，不能使用其他类型！");
             }
         }
 
-        Logger.i("数据已更新！\nimage数量：" + imgs.size() + " view数量：" + views.size());
+        Logger.i("数据已更新！====" + "view数量：" + views.size());
 
-        adapter.setViews(imgs, views);
+        adapter.setViews(views);
     }
 
     /**
@@ -116,7 +106,7 @@ public class RingView extends ViewPager {
      * @param withAnim 自动轮播是否带有切换动画
      */
     public void startRing(final boolean withAnim) {
-        if (imgs.isEmpty() && views.isEmpty()) return;
+        if (views.size() <= 1) return;
 
         timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -172,6 +162,8 @@ public class RingView extends ViewPager {
      * @param withAnim 跳转是否有动画效果
      */
     public void moveToNext(boolean withAnim) {
+        if (views.size() <= 1) return;
+
         stayTime = 0;
 
         setCurrentItem(getCurrentItem() + 1, withAnim);
@@ -183,6 +175,8 @@ public class RingView extends ViewPager {
      * @param withAnim 跳转是否有动画效果
      */
     public void moveToLast(boolean withAnim) {
+        if (views.size() <= 1) return;
+
         stayTime = 0;
 
         setCurrentItem(getCurrentItem() - 1, withAnim);
@@ -203,7 +197,6 @@ public class RingView extends ViewPager {
     public void release() {
         timer.cancel();
         views.clear();
-        imgs.clear();
         adapter.release();
         timerHandler = null;
 
