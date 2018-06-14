@@ -49,11 +49,14 @@ ringView.setPhotoTouchListener(new RingView.OnPhotoTouchListener() {
     }
 });
 ```
-调用`ringView.startRing(boolean withAnim)`方法可开始进行轮播，其参数表示轮播是否带有切换动画。调用`ringView.stopRing()`停止轮播。并可通过`ringView.setRingTime(int ringTime)`方法设置轮播间隔时间，单位ms，默认1000。调用`ringView.setTouchToPause(boolean touchToPause)`方法可设置是否在手指触摸屏幕时暂停播放，默认为true。并可以通过调用`ringView.moveToLast(boolean withAnim)`和`ringView.resetToFirst(boolean withAnim)`、`ringView.resetToFirst(boolean withAnim)`方法分别跳转下一张、上一站和重置为第一张，其bool参数表示跳转时是否带有动画（建议在调用`resetToFirst`方法是参数设置为false）。
+调用`ringView.startRing(boolean withAnim)`方法可开始进行轮播，其参数表示轮播是否带有切换动画。
+调用`ringView.stopRing()`停止轮播。并可通过`ringView.setRingTime(int ringTime)`方法设置轮播间隔时间，单位ms，默认1000。
+调用`ringView.setTouchToPause(boolean touchToPause)`方法可设置是否在手指触摸屏幕时暂停播放，默认为true。
+并可以通过调用`ringView.moveToLast(boolean withAnim)`和`ringView.resetToFirst(boolean withAnim)`、`ringView.resetToFirst(boolean withAnim)`方法分别跳转下一张、上一站和重置为第一张，其bool参数表示跳转时是否带有动画（建议在调用`resetToFirst`方法是参数设置为false）。
 
 最后：
 ---
-在Activity结束时不要忘记在OnDestory中调用`ringView.release();`释放资源，避免内存泄漏。
+在Activity结束时不要忘记在onDestory中调用`ringView.release();`释放资源，避免内存泄漏。
 
 最后的最后：
 --
