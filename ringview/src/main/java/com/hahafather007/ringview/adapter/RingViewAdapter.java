@@ -2,16 +2,20 @@ package com.hahafather007.ringview.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.SparseArray;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.hahafather007.ringview.utils.Logger;
+import com.hahafather007.ringview.R;
+import com.hahafather007.ringview.view.MyFrameLayout;
 import com.hahafather007.ringview.view.RingView;
 
 import java.util.ArrayList;
@@ -20,8 +24,10 @@ import java.util.List;
 /**
  * Created by chenpengxiang on 2018/6/11
  */
-public class RingViewAdapter extends PagerAdapter {
+public class RingViewAdapter extends PagerAdapter{
     private List<Object> views = new ArrayList<>();
+    private SparseArray<Bitmap> viewCaches = new SparseArray<>();
+    private SparseArray<MyFrameLayout> layoutCaches = new SparseArray<>();
     private Context context;
     private ViewPager pager;
     private RingView.OnPhotoTouchListener listener;
@@ -83,23 +89,58 @@ public class RingViewAdapter extends PagerAdapter {
 
             return image;
         } else {
-            View view = (View) o;
-            ViewGroup parent = (ViewGroup) view.getParent();
+            final int size = views.size();
 
-            if (parent != null) {
-                parent.removeView(view);
+            if (position >= size && position < size * 2) {
+                if (layoutCaches.get(position % size) == null) {
+                    @SuppressLint("InflateParams")
+                    MyFrameLayout layout = ((MyFrameLayout) LayoutInflater.from(context)
+                            .inflate(R.layout.ring_holder, null));
+                    layout.addView((View) o);
+                    layout.setListener(new MyFrameLayout.OnCreatedBitmapListener() {
+                        @Override
+                        public void getBitmap(Bitmap bitmap) {
+                            viewCaches.put(position % size, bitmap);
+                        }
+                    });
+
+                    layoutCaches.put(position % size, layout);
+
+                    container.addView(layout);
+
+                    return layout;
+                } else {
+                    MyFrameLayout layout = layoutCaches.get(position % size);
+
+                    container.addView(layout);
+
+                    return layout;
+                }
+
+            } else {
+                ImageView image = new ImageView(context);
+
+                if (viewCaches.get(position % size) != null) {
+                    Glide.with(image).load(viewCaches.get(position % size)).into(image);
+                }
+
+                container.addView(image);
+
+                return image;
             }
-
-            Logger.i(view.getBackground() + " ");
-
-            container.addView(view);
-
-            return o;
         }
     }
 
     public void setViews(List<Object> viewList) {
         views = viewList;
+        layoutCaches.clear();
+        viewCaches.clear();
+
+        if (viewList.size() <= 2) {
+            pager.setOffscreenPageLimit(1);
+        } else {
+            pager.setOffscreenPageLimit(3);
+        }
 
         notifyDataSetChanged();
 
@@ -113,7 +154,6 @@ public class RingViewAdapter extends PagerAdapter {
         this.pager = pager;
 
         pager.setAdapter(this);
-        pager.setOffscreenPageLimit(3);
         pager.addOnPageChangeListener(new SimplePageChangeListener() {
             int thisPosition;
 
@@ -159,6 +199,8 @@ public class RingViewAdapter extends PagerAdapter {
      */
     public void release() {
         views.clear();
+        viewCaches.clear();
+        layoutCaches.clear();
         listener = null;
     }
 }

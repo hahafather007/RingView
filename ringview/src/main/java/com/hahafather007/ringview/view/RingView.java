@@ -41,6 +41,18 @@ public class RingView extends ViewPager {
      */
     private int ringTime = 1000;
     private int stayTime = 0;
+    /**
+     * 标记是否设置了点击暂停轮播
+     */
+    private boolean touchToPause = true;
+    /**
+     * 标记是否设置了轮播时带有动画
+     */
+    private boolean ringWithAnim;
+    /**
+     * 标记是否设置了自动轮播
+     */
+    private boolean autoRing;
 
     public RingView(@NonNull Context context) {
         this(context, null);
@@ -50,6 +62,27 @@ public class RingView extends ViewPager {
         super(context, attrs);
 
         init();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                if (touchToPause) {
+                    timer.cancel();
+                    timer = null;
+                }
+
+                break;
+            case MotionEvent.ACTION_UP:
+                if (autoRing && timer == null) {
+                    startRing(ringWithAnim);
+                }
+
+                break;
+        }
+
+        return super.dispatchTouchEvent(ev);
     }
 
     private void init() {
@@ -108,6 +141,9 @@ public class RingView extends ViewPager {
     public void startRing(final boolean withAnim) {
         if (views.size() <= 1) return;
 
+        ringWithAnim = withAnim;
+        autoRing = true;
+
         timer = new Timer();
         timer.schedule(new TimerTask() {
 
@@ -136,6 +172,8 @@ public class RingView extends ViewPager {
      */
     public void stopRing() {
         timer.cancel();
+
+        autoRing = false;
     }
 
     /**
@@ -150,6 +188,20 @@ public class RingView extends ViewPager {
      */
     public void setRingTime(int ringTime) {
         this.ringTime = ringTime;
+    }
+
+    /**
+     * @return 返回是否设置了点击图片时暂停轮播
+     */
+    public boolean isTouchToPause() {
+        return touchToPause;
+    }
+
+    /**
+     * @param touchToPause 传入bool值设置是否开启点击图片时暂停播放，默认开启
+     */
+    public void setTouchToPause(boolean touchToPause) {
+        this.touchToPause = touchToPause;
     }
 
     public int getPosition() {
@@ -188,7 +240,7 @@ public class RingView extends ViewPager {
      * @param withAnim 重置是否有动画（建议不添加动画效果，可能会产生卡顿）
      */
     public void resetToFirst(boolean withAnim) {
-        setCurrentItem(0, withAnim);
+        setCurrentItem(views.size() == 1 ? 0 : views.size(), withAnim);
     }
 
     /**
@@ -198,6 +250,7 @@ public class RingView extends ViewPager {
         timer.cancel();
         views.clear();
         adapter.release();
+        timerHandler.removeCallbacksAndMessages(null);
         timerHandler = null;
 
         clearOnPageChangeListeners();
